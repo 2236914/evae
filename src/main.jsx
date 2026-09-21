@@ -1,8 +1,14 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
+import LandscapeBackground from './LandscapeBackground';
 
-const brands = ['DOCTOR HASIA', 'DOCTORS DOSE', 'DOCTOR HASIA BESPOKE', 'THE COLLAGEN DOCTOR'];
+const trustedBrands = [
+  { name: 'Doctor Hasia', src: '/assets/doctorhasia.svg' },
+  { name: 'Doctors Dose', src: '/assets/doctorsdose.svg' },
+  { name: 'Doctor Hasia Bespoke', src: '/assets/bespoke.svg' },
+  { name: 'Doctor Hasia Academy', src: '/assets/academy.svg' },
+];
 
 function Button({ children, href = '#contact', variant = 'primary' }) {
   return <a className={`button button--${variant}`} href={href}>{children}</a>;
@@ -30,39 +36,42 @@ function Navigation() {
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 901px)');
+    const closeOnDesktop = (event) => event.matches && setMenuOpen(false);
+    desktopQuery.addEventListener('change', closeOnDesktop);
+    return () => desktopQuery.removeEventListener('change', closeOnDesktop);
+  }, []);
+
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <>
-      <header className={`nav shell${scrolled ? ' nav--scrolled' : ''}${menuOpen ? ' nav--menu-open' : ''}`}>
-        <a className="wordmark" href="/" aria-label="EVAE home">EVAE</a>
-        <nav className="nav__links" aria-label="Primary navigation">
-          <a href="#services">Services</a>
-          <a href="#blueprint">Blueprint</a>
-          <a href="#process">Process</a>
-          <a href="#faq">FAQ</a>
-        </nav>
-        <Button variant="nav">Book a call</Button>
-        <button className="nav__menu" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen((open) => !open)}><span /><span /></button>
-      </header>
-      <nav id="mobile-navigation" className={`nav__mobile${menuOpen ? ' nav__mobile--open' : ''}`} aria-label="Mobile navigation" aria-hidden={!menuOpen}>
-        <a className="nav__mobile-wordmark" href="/" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>EVAE</a>
+    <header className={`nav shell${scrolled ? ' nav--scrolled' : ''}${menuOpen ? ' nav--menu-open' : ''}`}>
+      <a className="wordmark" href="/" aria-label="EVAE home">EVAE</a>
+      <nav className="nav__links" aria-label="Primary navigation">
+        <a href="#services">Services</a>
+        <a href="#blueprint">Blueprint</a>
+        <a href="#process">Process</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <Button variant="nav">Book a call</Button>
+      <button className="nav__menu" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen((open) => !open)}><span /><span /></button>
+      <nav id="mobile-navigation" className="nav__mobile" aria-label="Mobile navigation" aria-hidden={!menuOpen}>
         <div className="nav__mobile-links">
           <a href="#services" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>Services</a>
           <a href="#blueprint" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>Blueprint</a>
           <a href="#process" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>Process</a>
           <a href="#faq" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>FAQ</a>
         </div>
-        <Button variant="mobile" href="#contact">Book a call</Button>
+        <a className="button button--mobile" href="#contact" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>book a call</a>
       </nav>
-    </>
+    </header>
   );
 }
 
 function HeroContent() {
   return (
     <section className="hero__content shell">
-      <div className="eyebrow">Built on the Doctor Hasia blueprint</div>
       <h1 id="hero-title">Personal branding,<br />for the modern doctor.</h1>
       <p className="hero__lede">
         One team, one point of contact—for positioning, identity, content, social,
@@ -77,9 +86,25 @@ function HeroContent() {
 function BrandFooter() {
   return (
     <footer className="hero__footer shell">
-      <div className="footer__label">Trusted by</div>
-      <div className="brand-row">
-        {brands.map((brand) => <a href="#blueprint" className="brand-row__item" key={brand}>{brand}</a>)}
+      <div className="footer__label">
+        <span className="footer__portrait" aria-hidden="true"><img src="/assets/dr-hasia.jpg" alt="" /></span>
+        <span className="footer__label-copy">
+          <span>Built on the</span>
+          <span>Dr. Hasia blueprint</span>
+        </span>
+      </div>
+      <div className="brand-row" aria-label="Trusted brands">
+        <div className="brand-row__track">
+          {[0, 1, 2, 3].map((groupIndex) => (
+            <div className="brand-row__group" aria-hidden={groupIndex > 0 ? 'true' : undefined} key={groupIndex}>
+              {trustedBrands.map((brand) => (
+                <a href="#blueprint" className="brand-row__item" tabIndex={groupIndex > 0 ? -1 : undefined} key={`${groupIndex}-${brand.name}`}>
+                  <img src={brand.src} alt={groupIndex === 0 ? brand.name : ''} draggable="false" />
+                </a>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </footer>
   );
@@ -458,7 +483,7 @@ function BackgroundFader() {
 
   useEffect(() => {
     const sectionOrder = [
-      ['reality', 1, 0], ['services', 3, 0], ['blueprint', 2, 0], ['process', 4, 0],
+      ['services', 5, 0], ['process', 4, 0],
       ['who-its-for', 5, .45], ['founder', 5, .45], ['faq', 2, 0], ['contact', 4, 0],
     ];
     const update = () => {
@@ -481,10 +506,7 @@ function BackgroundFader() {
 
   return (
     <div className="background-fader" aria-hidden="true">
-      <video className={`background-fader__media background-fader__video${active === 0 ? ' background-fader__media--active' : ''}`} autoPlay muted loop playsInline>
-        <source src="/assets/evae-bg-loop.webm" type="video/webm" />
-        <source src="/assets/evae-bg-loop.mp4" type="video/mp4" />
-      </video>
+      <LandscapeBackground active={active === 0} />
       <div className={`background-fader__media background-fader__white${active === 5 ? ' background-fader__media--active' : ''}`} />
       {[1, 2, 3, 4].map((state) => <img className={`background-fader__media${active === state ? ' background-fader__media--active' : ''}`} key={state} src={`/assets/evae-bg-${state}.png`} alt="" />)}
     </div>
@@ -499,8 +521,8 @@ createRoot(document.getElementById('root')).render(
       <BackgroundFader />
       <Hero />
       <RealitySection />
-      <ServicesSection />
       <BlueprintSection />
+      <ServicesSection />
       <HowWorksSection />
       <WhoItsForSection />
       <FounderSection />
