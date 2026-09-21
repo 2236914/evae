@@ -3,6 +3,11 @@ import { createRoot } from 'react-dom/client';
 import './style.css';
 import LandscapeBackground from './LandscapeBackground';
 
+const heroServices = [
+  'Social media', 'Website', 'Videography', 'Video editing', 'Podcasts',
+  'Script writing', 'Positioning', 'Online course development', 'Creative AI',
+];
+
 const trustedBrands = [
   { name: 'Doctor Hasia', src: '/assets/doctorhasia.svg' },
   { name: 'Doctors Dose', src: '/assets/doctorsdose.svg' },
@@ -72,12 +77,13 @@ function Navigation() {
 function HeroContent() {
   return (
     <section className="hero__content shell">
-      <h1 id="hero-title">Personal branding,<br />for the modern doctor.</h1>
+      <h1 id="hero-title">Elevate your<br />digital presence.</h1>
       <p className="hero__lede">
-        One team, one point of contact—for positioning, identity, content, social,
-        <br className="desktop-break" /> and a custom website. Built for doctors who want to be known for more
-        <br className="desktop-break" /> than their credentials.
+        Personal branding for the modern doctor—one team, one point of contact.
       </p>
+      <ul className="hero__chips" aria-label="What we do">
+        {heroServices.map((service) => <li key={service}>{service}</li>)}
+      </ul>
       <Button>Book a discovery call</Button>
     </section>
   );
@@ -90,7 +96,7 @@ function BrandFooter() {
         <span className="footer__portrait" aria-hidden="true"><img src="/assets/dr-hasia.jpg" alt="" /></span>
         <span className="footer__label-copy">
           <span>Built on the</span>
-          <span>Dr. Hasia blueprint</span>
+          <span>Dr. Hasia's blueprint</span>
         </span>
       </div>
       <div className="brand-row" aria-label="Trusted brands">
