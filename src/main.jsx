@@ -1,12 +1,11 @@
 import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ArrowUpRight, Check, Globe2, Minus, Share2 } from 'lucide-react';
 import './style.css';
-import LandscapeBackground from './LandscapeBackground';
-
-const heroServices = [
-  'Social media', 'Website', 'Videography', 'Video editing', 'Podcasts',
-  'Script writing', 'Positioning', 'Online course development', 'Creative AI',
-];
+import ScrollBackground from './ScrollBackground';
+import Reveal from './Reveal';
+import SmoothScroll from './SmoothScroll';
+import ScrambleText from './ScrambleText';
 
 const trustedBrands = [
   { name: 'Doctor Hasia', src: '/assets/doctorhasia.svg' },
@@ -15,19 +14,33 @@ const trustedBrands = [
   { name: 'Doctor Hasia Academy', src: '/assets/academy.svg' },
 ];
 
+const channelIcons = { Website: Globe2, 'Social media': Share2 };
+
 function Button({ children, href = '#contact', variant = 'primary' }) {
   return <a className={`button button--${variant}`} href={href}>{children}</a>;
 }
 
 function Navigation() {
   const [scrolled, setScrolled] = useState(false);
+  const [overHero, setOverHero] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 24);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 24);
+      const hero = document.getElementById('hero');
+      if (!hero) return;
+      const scrollRange = Math.max(window.innerHeight, hero.offsetHeight - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, (window.scrollY - hero.offsetTop) / scrollRange));
+      setOverHero(window.scrollY < hero.offsetTop + hero.offsetHeight && progress < .86);
+    };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -51,12 +64,13 @@ function Navigation() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className={`nav shell${scrolled ? ' nav--scrolled' : ''}${menuOpen ? ' nav--menu-open' : ''}`}>
+    <header className={`nav shell${scrolled ? ' nav--scrolled' : ''}${overHero ? ' nav--over-hero' : ''}${menuOpen ? ' nav--menu-open' : ''}`}>
       <a className="wordmark" href="/" aria-label="EVAE home">EVAE</a>
       <nav className="nav__links" aria-label="Primary navigation">
         <a href="#services">Services</a>
         <a href="#blueprint">Blueprint</a>
         <a href="#process">Process</a>
+        <a href="#packages">Packages</a>
         <a href="#faq">FAQ</a>
       </nav>
       <Button variant="nav">Book a call</Button>
@@ -66,6 +80,7 @@ function Navigation() {
           <a href="#services" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>Services</a>
           <a href="#blueprint" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>Blueprint</a>
           <a href="#process" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>Process</a>
+          <a href="#packages" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>Packages</a>
           <a href="#faq" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>FAQ</a>
         </div>
         <a className="button button--mobile" href="#contact" tabIndex={menuOpen ? 0 : -1} onClick={closeMenu}>book a call</a>
@@ -76,30 +91,29 @@ function Navigation() {
 
 function HeroContent() {
   return (
-    <section className="hero__content shell">
-      <h1 id="hero-title">Elevate your<br />digital presence.</h1>
-      <p className="hero__lede">
-        Personal branding for the modern doctor—one team, one point of contact.
-      </p>
-      <ul className="hero__chips" aria-label="What we do">
-        {heroServices.map((service) => <li key={service}>{service}</li>)}
-      </ul>
-      <Button>Book a discovery call</Button>
-    </section>
+    <div className="hero__content shell">
+      <h1 id="hero-title">
+        <ScrambleText className="hero__line hero__line--soft" text="Elevate your" />
+        <ScrambleText className="hero__line hero__line--strong" text="digital presence." />
+      </h1>
+      <ScrambleText as="p" className="hero__lede" text={"Personal branding for the modern doctor.\nOne team. One point of contact."} />
+      <Button variant="cta">
+        <span>book a strategy call</span>
+        <span className="button__icon" aria-hidden="true"><ArrowUpRight strokeWidth={2.2} /></span>
+      </Button>
+    </div>
   );
 }
 
 function BrandFooter() {
   return (
-    <footer className="hero__footer shell">
+    <footer className="hero__footer">
       <div className="footer__label">
+        <span>The team behind</span>
         <span className="footer__portrait" aria-hidden="true"><img src="/assets/dr-hasia.jpg" alt="" /></span>
-        <span className="footer__label-copy">
-          <span>Built on the</span>
-          <span>Dr. Hasia's blueprint</span>
-        </span>
+        <span>Dr. Hasia</span>
       </div>
-      <div className="brand-row" aria-label="Trusted brands">
+      <div className="brand-row" aria-label="Brands built by the team behind Doctor Hasia">
         <div className="brand-row__track">
           {[0, 1, 2, 3].map((groupIndex) => (
             <div className="brand-row__group" aria-hidden={groupIndex > 0 ? 'true' : undefined} key={groupIndex}>
@@ -118,92 +132,13 @@ function BrandFooter() {
 
 function Hero() {
   return (
-    <main className="hero" aria-labelledby="hero-title">
-      <div className="hero__ambient hero__ambient--one" />
-      <div className="hero__ambient hero__ambient--two" />
-      <div className="hero__ambient hero__ambient--three" />
-      <div className="hero__ambient hero__ambient--four" />
-      <div className="hero__grain" />
-      <HeroContent />
-      <BrandFooter />
+    <main className="hero" id="hero" aria-labelledby="hero-title">
+      <div className="hero__sticky">
+        <div className="hero__shade" aria-hidden="true" />
+        <HeroContent />
+        <BrandFooter />
+      </div>
     </main>
-  );
-}
-
-function SearchIcon() {
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3" /><path d="m16 16 4.5 4.5" /></svg>;
-}
-
-function CalendarIcon() {
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2" /><path d="M8 3.8v3.5M16 3.8v3.5M4 9.5h16" /></svg>;
-}
-
-function OpportunityIcon({ type }) {
-  if (type === 'panel') return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2" /><path d="M9 20v-5h6v5M8.5 8h1M14.5 8h1M8.5 11h1M14.5 11h1" /></svg>;
-  if (type === 'referral') return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3" /><path d="M6.5 19c.6-3 2.3-4.5 5.5-4.5s4.9 1.5 5.5 4.5M4 12.5c1.8-.1 3 .4 3.8 1.5M20 12.5c-1.8-.1-3 .4-3.8 1.5" /></svg>;
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3" /><path d="M5.5 20c.6-3.3 2.8-5 6.5-5s5.9 1.7 6.5 5" /></svg>;
-}
-
-function ProfileCard() {
-  return (
-    <div className="profile-card">
-      <div className="profile-card__top">
-        <div className="profile-card__avatar" />
-        <div className="profile-card__copy">
-          <span className="profile-card__role">Dermatologist</span>
-          <i /><i /><i className="profile-card__line--short" />
-        </div>
-      </div>
-      <div className="profile-card__bottom">
-        <span><b className="mini-icon">⌁</b> Board certified</span>
-        <span><b className="mini-icon">▤</b> Publications</span>
-        <span><b className="mini-icon">♧</b> Speaker</span>
-      </div>
-    </div>
-  );
-}
-
-function RealitySection() {
-  const opportunities = [
-    ['referral', 'Referrals'],
-    ['panel', 'Panels'],
-    ['client', 'Private clients'],
-  ];
-
-  return (
-    <section className="reality" id="reality" aria-labelledby="reality-title">
-      <div className="reality__ambient reality__ambient--one" />
-      <div className="reality__ambient reality__ambient--two" />
-      <div className="shell reality__inner">
-      <div className="eyebrow">02 The reality</div>
-        <h2 id="reality-title">Being a great doctor<br />isn’t enough anymore.</h2>
-        <p className="reality__lede">Patients search before they book. Colleagues, hospitals and media look you up<br className="desktop-break" /> before they call. Evae builds the presence your expertise already deserves—<br className="desktop-break" /> without you learning to be a content creator.</p>
-
-        <div className="reality__cards">
-          <article className="glass-card search-card">
-            <h3>Before they call, they search.</h3>
-            <p>Your digital presence is already part of the decision.</p>
-            <div className="search-flow" aria-label="Search to booking flow illustration">
-              <div className="search-pill"><SearchIcon /><span>best dermatologist near me</span></div>
-              <div className="flow-line flow-line--search" />
-              <ProfileCard />
-              <div className="flow-line flow-line--book" />
-              <div className="book-pill"><CalendarIcon /><span>Book</span></div>
-            </div>
-          </article>
-
-          <article className="glass-card opportunity-card">
-            <h3>Visibility creates<br />opportunity.</h3>
-            <div className="opportunity-flow" aria-label="Visibility opportunity illustration">
-              <div className="opportunity-orbit opportunity-orbit--one" />
-              <div className="opportunity-orbit opportunity-orbit--two" />
-              {opportunities.map(([type, label]) => <div className={`opportunity-pill opportunity-pill--${type}`} key={label}><span className="opportunity-icon"><OpportunityIcon type={type} /></span><span>{label}</span></div>)}
-              <span className="orbit-dot orbit-dot--one" /><span className="orbit-dot orbit-dot--two" />
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -234,13 +169,12 @@ function ServicesSection() {
 
   return (
     <section className="services" id="services" aria-labelledby="services-title">
-      <div className="services__fade" />
-      <div className="shell services__inner">
-      <div className="eyebrow eyebrow--light">03 Services</div>
-        <h2 id="services-title">Everything a doctor<br />needs to be known online.</h2>
+      <Reveal className="shell services__inner">
+      <div className="eyebrow eyebrow--light">Services</div>
+        <ScrambleText as="h2" id="services-title" text={"Everything a doctor\nneeds to be known online."} />
         <p className="services__prompt">Hover to explore</p>
-      </div>
-      <div className="services__list">
+      </Reveal>
+      <Reveal className="services__list" delayMs={80}>
         {services.map((service, index) => {
           const isOpen = openService === index;
           return <article
@@ -263,7 +197,7 @@ function ServicesSection() {
           >
             <div className="service-row__number">{service.number}</div>
             <div className="service-row__body">
-              <h3>{service.title}</h3>
+              <ScrambleText as="h3" text={service.title} />
               <div className="service-row__details">
                 <p className="service-row__description">{service.description}</p>
                 <div className="service-row__tags">{service.chips.map((chip) => <span key={chip}>{chip}</span>)}</div>
@@ -275,10 +209,13 @@ function ServicesSection() {
             <a className="service-row__arrow" href="#contact" aria-label={`Explore ${service.title}`}><ArrowIcon /></a>
           </article>;
         })}
-      </div>
+      </Reveal>
     </section>
   );
 }
+
+// Blueprint tiles paint the logo through a CSS mask, so they use the transparent *-mark.svg variants.
+const brandLogos = Object.fromEntries(trustedBrands.map((brand) => [brand.name, brand.src.replace('.svg', '-mark.svg')]));
 
 function BlueprintSection() {
   const brands = [
@@ -292,23 +229,27 @@ function BlueprintSection() {
     <section className="blueprint" id="blueprint" aria-labelledby="blueprint-title">
       <div className="blueprint__ambient blueprint__ambient--one" />
       <div className="blueprint__ambient blueprint__ambient--two" />
-      <div className="shell blueprint__header">
-        <div className="eyebrow eyebrow--light">04 The blueprint at work</div>
+      <Reveal className="shell blueprint__header">
+        <div className="eyebrow eyebrow--light">The blueprint at work</div>
         <p className="blueprint__kicker">Our proof of method</p>
-        <h2 id="blueprint-title">Everything we do,<br />we’ve done for ourselves first.</h2>
-        <p className="blueprint__lede"><strong>Four brands. Four distinct audiences. One proven approach.</strong><br />The Doctor Hasia ecosystem shows how clear positioning, a consistent identity and the right content system can build authority across different areas of medicine.</p>
-      </div>
+        <ScrambleText as="h2" id="blueprint-title" text={"Everything we do,\nwe’ve done for ourselves first."} />
+        <p className="blueprint__lede"><ScrambleText as="strong" text="Four brands. Four distinct audiences. One proven approach." /><br /><ScrambleText text="The Doctor Hasia ecosystem shows how clear positioning, a consistent identity and the right content system can build authority across different areas of medicine." /></p>
+      </Reveal>
       <div className="blueprint__stack shell">
         {brands.map((brand, index) => (
           <article className="blueprint-card" key={brand.name} style={{ '--card-index': index }}>
-            <div className="blueprint-card__image"><img src="/assets/blueprint-placeholder.webp" alt="" /></div>
+            <div className="blueprint-card__image liquid-glass-strong">
+              {brandLogos[brand.name]
+                ? <span className="blueprint-card__logo" role="img" aria-label={brand.name} style={{ '--logo': `url(${brandLogos[brand.name]})` }} />
+                : <span className="blueprint-card__wordmark" role="img" aria-label={brand.name}>The Collagen<br />Doctor</span>}
+            </div>
             <div className="blueprint-card__info">
               <span className="blueprint-card__number">{brand.number}</span>
-              <h3>{brand.name}</h3>
-              <p className="blueprint-card__description">{brand.description}</p>
+              <ScrambleText as="h3" text={brand.name} />
+              <ScrambleText as="p" className="blueprint-card__description" text={brand.description} />
               <div className="blueprint-card__rule" />
               <div className="blueprint-card__metrics"><span><b>Followers</b>{brand.followers}</span><span><b>Reach</b>{brand.reach}</span></div>
-              <div className="blueprint-card__footer"><div className="blueprint-card__chips">{brand.channels.map((channel) => <span key={channel}>{channel}</span>)}</div><a href="#contact">Explore the full case study <ArrowIcon /></a></div>
+              <div className="blueprint-card__footer"><div className="blueprint-card__chips">{brand.channels.map((channel) => { const Icon = channelIcons[channel] || Globe2; return <span key={channel}><Icon aria-hidden="true" strokeWidth={1.7} />{channel}</span>; })}</div><a href="#contact">Explore the full case study <ArrowIcon /></a></div>
             </div>
           </article>
         ))}
@@ -324,31 +265,231 @@ const processSteps = [
   { number: '04', title: 'Grow', summary: 'A consistent system that keeps moving forward.', body: 'We manage the ongoing content and systems that keep your presence active, consistent and moving forward. Future offers—including courses and digital products—can grow from this foundation.', visual: 'Publishing rhythm, reporting and future offers' },
 ];
 
+const STEP_MS = 4500;
+
 function HowWorksSection() {
   const [activeStep, setActiveStep] = useState(0);
+  const [autoplay, setAutoplay] = useState(false);
+  const [inView, setInView] = useState(false);
+  const visualRef = useRef(null);
   const active = processSteps[activeStep];
+
+  // Mobile: the step list is hidden and the visual tile plays through the steps on a timer.
+  useEffect(() => {
+    const mobile = window.matchMedia('(max-width: 900px)');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setAutoplay(mobile.matches && !reduced.matches);
+    sync();
+    mobile.addEventListener('change', sync);
+    reduced.addEventListener('change', sync);
+    return () => { mobile.removeEventListener('change', sync); reduced.removeEventListener('change', sync); };
+  }, []);
+
+  useEffect(() => {
+    const el = visualRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: .4 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!autoplay || !inView) return undefined;
+    const id = setTimeout(() => setActiveStep((step) => (step + 1) % processSteps.length), STEP_MS);
+    return () => clearTimeout(id);
+  }, [autoplay, inView, activeStep]);
 
   return (
     <section className="process" id="process" aria-labelledby="process-title">
-      <div className="process__layout shell">
+      <Reveal className="process__layout shell">
         <div className="process__intro">
-          <div className="eyebrow eyebrow--light">05 How it works</div>
-          <h2 id="process-title">A clear process,<br />built around you.</h2>
-          <p>From the first conversation to ongoing growth, every stage is managed by one team.</p>
-          <div className="process__visual">
-            <img src="/assets/blueprint-placeholder.webp" alt="" />
-            <div className="process__visual-caption"><span>{active.number}</span><strong>{active.title}</strong><small>{active.visual}</small></div>
+          <div className="eyebrow eyebrow--light">How it works</div>
+          <ScrambleText as="h2" id="process-title" text={"A clear process,\nbuilt around you."} />
+          <ScrambleText as="p" text="From the first conversation to ongoing growth, every stage is managed by one team." />
+          <div className="process__visual" ref={visualRef} data-autoplay={autoplay} style={{ '--step-ms': `${STEP_MS}ms` }}>
+            <div className="process__visual-art">
+              <span className="process__visual-index" key={active.number} aria-hidden="true">{active.number}</span>
+              <ol className="process__visual-ticks" aria-label="Steps">
+                {processSteps.map((step, i) => (
+                  <li key={step.number} className={i < activeStep ? 'is-done' : i === activeStep ? 'is-active' : ''}>
+                    <button type="button" aria-label={`Step ${step.number}: ${step.title}`} aria-current={i === activeStep ? 'step' : undefined} onClick={() => setActiveStep(i)}><span><i /></span></button>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div className="process__visual-caption" key={autoplay ? active.number : 'static'}>
+              <span>{active.number}</span>
+              <strong>{active.title}</strong>
+              <small>{active.visual}</small>
+              <p className="process__visual-summary">{active.summary}</p>
+            </div>
           </div>
         </div>
         <div className="process__steps">
           {processSteps.map((step, index) => (
-            <button className={`process-step${activeStep === index ? ' process-step--active' : ''}`} key={step.number} type="button" aria-expanded={activeStep === index} onMouseEnter={() => setActiveStep(index)} onFocus={() => setActiveStep(index)} onClick={() => setActiveStep(index)}>
-              <span className="process-step__top"><span className="process-step__number">{step.number}</span><span className="process-step__title">{step.title}</span><span className="process-step__icon">{activeStep === index ? '−' : '+'}</span></span>
+            <Reveal delayMs={index * 60} key={step.number}><button className={`process-step${activeStep === index ? ' process-step--active' : ''}`} type="button" aria-expanded={activeStep === index} onMouseEnter={() => setActiveStep(index)} onFocus={() => setActiveStep(index)} onClick={() => setActiveStep(index)}>
+              <span className="process-step__top"><span className="process-step__number">{step.number}</span><ScrambleText className="process-step__title" text={step.title} /><span className="process-step__icon">{activeStep === index ? '−' : '+'}</span></span>
               <span className="process-step__content"><strong>{step.summary}</strong><span>{step.body}</span></span>
-            </button>
+            </button></Reveal>
+          ))}
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+const aed = (n) => `AED ${n.toLocaleString('en-GB')}`;
+const tierNames = ['Essential', 'Authority', 'Elite'];
+
+const packages = [
+  {
+    id: 'essential', name: 'Essential', price: 18000, total: 54000,
+    bestFor: 'building a professional personal brand foundation',
+    session: '1 private session with Dr Hasia', includesFrom: null, cta: 'Start with Essential',
+    highlights: ['Personal brand strategy', 'Brand positioning and niche', 'Monthly content strategy with full scripting', '10 edited social videos per month', 'Personal-brand website', 'Profile and bio optimisation', 'Content pillars and messaging'],
+  },
+  {
+    id: 'authority', name: 'Authority', featured: true, badge: 'Most popular', price: 30000, total: 90000,
+    bestFor: 'becoming a recognised authority in your niche',
+    session: '2 private sessions with Dr Hasia', includesFrom: 'Essential', cta: 'Build authority',
+    highlights: ['Advanced authority positioning', '15 edited social videos per month', 'Premium personal-brand website', 'Dedicated social media expert', 'Personal Branding Course and Blueprint', 'Competitor review and signature content series', '90-day authority roadmap with advanced monthly analytics'],
+  },
+  {
+    id: 'elite', name: 'Elite', price: 45000, total: 135000,
+    bestFor: 'building a full-scale personal media brand and digital ecosystem',
+    session: 'A private session with Dr Hasia every month', includesFrom: 'Authority', cta: 'Go Elite',
+    highlights: ['Full authority and growth strategy', 'In-depth and premium positioning', 'Full monthly media strategy', 'Premium full personal-brand website', 'Priority expert support', '6 AI branded videos per month', 'Dubai professional videography for Dubai-based clients'],
+  },
+];
+
+// [label, essential, authority, elite] — booleans render as icons, strings as text.
+const comparison = [
+  { group: 'Strategy & positioning', rows: [
+    ['Dr Hasia 1:1', '1 private session', '2 private sessions', '1 private session every month'],
+    ['Personal brand strategy', 'Included', 'Advanced authority positioning', 'Full authority & growth strategy'],
+    ['Brand positioning & niche', 'Included', 'In-depth', 'In-depth + premium positioning'],
+    ['Competitor positioning review', false, true, true],
+    ['90-day authority roadmap', false, true, true],
+  ] },
+  { group: 'Content & production', rows: [
+    ['Content strategy', 'Monthly', 'Monthly + authority roadmap', 'Full monthly media strategy'],
+    ['Full scripting', true, true, true],
+    ['Trend forecasting', true, true, true],
+    ['Edited social videos', '10 / month', '15 / month', '15 / month'],
+    ['Signature content series', false, true, true],
+    ['AI branded videos', false, false, '6 / month'],
+    ['Dubai professional videography', false, false, 'Dubai-based clients'],
+  ] },
+  { group: 'Digital presence', rows: [
+    ['Website', 'Personal-brand website', 'Premium personal-brand website', 'Premium full personal-brand website'],
+    ['Profile & bio optimisation', true, true, true],
+    ['Content pillars & messaging', true, true, true],
+  ] },
+  { group: 'Support & learning', rows: [
+    ['Social media expert support', 'Strategy + support', 'Dedicated expert support', 'Priority expert support'],
+    ['Personal Branding Course', false, true, true],
+    ['Dr Hasia Personal Branding Blueprint', false, true, true],
+    ['Analytics & optimisation', 'Basic', 'Advanced monthly review', 'Advanced monthly review'],
+  ] },
+];
+
+function CompareCell({ value, tier, featured }) {
+  const isBool = typeof value === 'boolean';
+  return (
+    <td className={featured ? 'compare__cell--featured' : undefined} data-tier={tier} data-value={isBool ? String(value) : 'text'}>
+      {!isBool && value}
+      {isBool && value && <><Check aria-hidden="true" strokeWidth={2} /><span className="sr-only">Included</span></>}
+      {isBool && !value && <><Minus aria-hidden="true" strokeWidth={2} /><span className="sr-only">Not included</span></>}
+    </td>
+  );
+}
+
+function PackagesSection() {
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [activeTier, setActiveTier] = useState('authority'); // mobile tab pill; desktop shows all three
+
+  return (
+    <section className="packages" id="packages" aria-labelledby="packages-title">
+      <Reveal className="packages__inner shell">
+        <div className="eyebrow eyebrow--light">Packages</div>
+        <p className="packages__kicker">3-month programme</p>
+        <ScrambleText as="h2" id="packages-title" text={"Three ways to begin.\nOne dedicated team."} />
+        <ScrambleText as="p" className="packages__lede" text="Strategy, authority building and content execution. Every tier includes private 1:1 time with Dr Hasia." />
+      </Reveal>
+      <div className="packages__tabs-wrap shell">
+        <div className="packages__tabs liquid-glass" role="tablist" aria-label="Choose a package">
+          {packages.map((tier) => (
+            <button key={tier.id} className={`packages__tab${tier.id === activeTier ? ' is-active' : ''}`} type="button" role="tab" aria-selected={tier.id === activeTier} aria-controls={`package-panel-${tier.id}`} onClick={() => setActiveTier(tier.id)}>{tier.name}</button>
           ))}
         </div>
       </div>
+      <div className="packages__grid shell">
+        {packages.map((tier, index) => (
+          <Reveal delayMs={index * 70} key={tier.id} className={tier.id === activeTier ? 'is-active' : ''}>
+            <article id={`package-panel-${tier.id}`} className={`package-card liquid-glass-strong${tier.featured ? ' package-card--featured' : ''}`} aria-labelledby={`package-${tier.id}`}>
+              {tier.badge && <span className="package-card__badge">{tier.badge}</span>}
+              <ScrambleText as="h3" id={`package-${tier.id}`} text={tier.name} />
+              <p className="package-card__price">
+                <span className="package-card__currency">AED</span>
+                <span className="package-card__amount">{tier.price.toLocaleString('en-GB')}</span>
+                <span className="package-card__per">/ month</span>
+                <span className="package-card__total">{aed(tier.total)} for the 3-month programme</span>
+              </p>
+              <p className="package-card__fit"><b>Best for</b> {tier.bestFor}.</p>
+              <p className="package-card__session">{tier.session}</p>
+              <ul className="package-card__list">
+                {tier.includesFrom && <li className="package-card__list-lead">Everything in {tier.includesFrom}, plus</li>}
+                {tier.highlights.map((item) => <li key={item}><Check aria-hidden="true" strokeWidth={2} /><span>{item}</span></li>)}
+              </ul>
+              <div className="package-card__cta">
+                <Button variant="cta"><span>{tier.cta}</span><span className="button__icon" aria-hidden="true"><ArrowUpRight strokeWidth={2.2} /></span></Button>
+              </div>
+            </article>
+          </Reveal>
+        ))}
+      </div>
+      <Reveal className="shell">
+        <div className="packages__clinics liquid-glass-strong">
+          <div>
+            <p className="packages__clinics-kicker">Clinics and group practices</p>
+            <ScrambleText as="h3" text="Multiple practitioners? We build bespoke clinic packages." />
+            <p>We create bespoke packages for clinics depending on their requirements.</p>
+          </div>
+          <Button variant="primary">Request a clinic proposal</Button>
+        </div>
+      </Reveal>
+      <Reveal className="shell">
+        <div className={`packages__compare liquid-glass-strong${compareOpen ? ' packages__compare--open' : ''}`}>
+          <button className="packages__compare-toggle" type="button" aria-expanded={compareOpen} aria-controls="packages-compare" onClick={() => setCompareOpen((open) => !open)}>
+            <span><strong>Compare all inclusions</strong><small>19 inclusions across three tiers</small></span>
+            <span className="faq-item__icon" aria-hidden="true">{compareOpen ? '−' : '+'}</span>
+          </button>
+          <div className="packages__compare-body" id="packages-compare" inert={!compareOpen}>
+            <div>
+              <table className="compare">
+                <thead>
+                  <tr>
+                    <th scope="col">Inclusion</th>
+                    {tierNames.map((name) => <th scope="col" key={name} className={name === 'Authority' ? 'compare__cell--featured' : undefined}>{name}</th>)}
+                  </tr>
+                </thead>
+                {comparison.map((group) => (
+                  <tbody key={group.group}>
+                    <tr className="compare__group"><th colSpan={4} scope="colgroup">{group.group}</th></tr>
+                    {group.rows.map(([label, ...values]) => (
+                      <tr key={label}>
+                        <th scope="row">{label}</th>
+                        {values.map((value, i) => <CompareCell key={tierNames[i]} value={value} tier={tierNames[i]} featured={i === 1} />)}
+                      </tr>
+                    ))}
+                  </tbody>
+                ))}
+              </table>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+      <p className="packages__note shell">All tiers are a 3-month minimum programme, billed monthly in AED. Every tier includes private 1:1 time with Dr Hasia.</p>
     </section>
   );
 }
@@ -378,11 +519,11 @@ function WhoItsForSection() {
   return (
     <section className={`fit${visible ? ' fit--visible' : ''}`} id="who-its-for" ref={sectionRef} aria-labelledby="fit-title">
       <div className="fit__inner shell">
-        <div className="eyebrow eyebrow--light">06 Who it’s for</div>
+        <div className="eyebrow eyebrow--light">Who it’s for</div>
         <p className="fit__kicker">Is EVAE right for you?</p>
-        <h2 id="fit-title">EVAE is for doctors<br />who are ready to be visible.</h2>
+        <ScrambleText as="h2" id="fit-title" text={"EVAE is for doctors\nwho are ready to be visible."} />
         <div className="fit__grid">
-          {fitStatements.map((statement, index) => <article className="fit-item" key={statement}><span>{String(index + 1).padStart(2, '0')}</span><p>{statement}</p></article>)}
+          {fitStatements.map((statement, index) => <article className="fit-item" key={statement}><span>{String(index + 1).padStart(2, '0')}</span><ScrambleText as="p" text={statement} /></article>)}
         </div>
         <p className="fit__closing">If that sounds like you, we should talk.</p>
         <Button href="#contact">Start the conversation</Button>
@@ -409,10 +550,10 @@ function FounderSection() {
   return (
     <section className={`founder${visible ? ' founder--visible' : ''}`} id="founder" ref={sectionRef} aria-labelledby="founder-title">
       <div className="founder__layout shell">
-        <div className="founder__portrait"><img src="/assets/blueprint-placeholder.webp" alt="Doctor Hasia, founder of EVAE" /></div>
+        <div className="founder__portrait"><img src="/assets/dr-hasia.jpg" alt="Doctor Hasia, founder of EVAE" loading="lazy" /></div>
         <div className="founder__copy">
-          <div className="eyebrow eyebrow--light">07 From the founder</div>
-          <h2 id="founder-title">The blueprint was built<br />from experience.</h2>
+          <div className="eyebrow eyebrow--light">From the founder</div>
+          <ScrambleText as="h2" id="founder-title" text={"The blueprint was built\nfrom experience."} />
           <blockquote>“I built my own digital presence one brand at a time. What changed my practice was not simply being seen—it was being understood. EVAE brings that same clarity, consistency and support to other doctors.”</blockquote>
           <p className="founder__byline"><strong>Doctor Hasia</strong><span>Founder, EVAE</span></p>
           <p className="founder__status">Working quotation — subject to founder approval before launch.</p>
@@ -435,22 +576,22 @@ function FAQSection() {
   const [openIndex, setOpenIndex] = useState(0);
   return (
     <section className="faq" id="faq" aria-labelledby="faq-title">
-      <div className="faq__layout shell">
+      <Reveal className="faq__layout shell">
         <div className="faq__intro">
-          <div className="eyebrow eyebrow--light">08 FAQ</div>
-          <h2 id="faq-title">Questions,<br />answered.</h2>
+          <div className="eyebrow eyebrow--light">FAQ</div>
+          <ScrambleText as="h2" id="faq-title" text={"Questions,\nanswered."} />
         </div>
         <div className="faq__surface">
           {faqItems.map(([question, answer], index) => (
             <div className={`faq-item${openIndex === index ? ' faq-item--open' : ''}`} key={question}>
               <button type="button" aria-expanded={openIndex === index} onClick={() => setOpenIndex(openIndex === index ? -1 : index)}>
-                <span className="faq-item__number">{String(index + 1).padStart(2, '0')}</span><span className="faq-item__question">{question}</span><span className="faq-item__icon">{openIndex === index ? '−' : '+'}</span>
+                <span className="faq-item__number">{String(index + 1).padStart(2, '0')}</span><ScrambleText className="faq-item__question" text={question} /><span className="faq-item__icon">{openIndex === index ? '−' : '+'}</span>
               </button>
               <div className="faq-item__answer"><p>{answer}</p></div>
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -470,16 +611,16 @@ function BeginSection() {
 
   return (
     <section className="begin" id="contact" style={{ '--begin-parallax': `${offset}px` }} aria-labelledby="begin-title">
-      <div className="begin__inner shell">
-        <div className="eyebrow eyebrow--light">09 Begin</div>
+      <Reveal className="begin__inner shell">
+        <div className="eyebrow eyebrow--light">Begin</div>
         <p className="begin__kicker">Your expertise is already there</p>
-        <h2 id="begin-title">Ready to be known<br />for more than your credentials?</h2>
-        <p className="begin__lede">Build a digital presence that reflects the quality of your work—and makes it easier for the right people to find you.</p>
+        <ScrambleText as="h2" id="begin-title" text={"Ready to be known\nfor more than your credentials?"} />
+        <ScrambleText as="p" className="begin__lede" text="Build a digital presence that reflects the quality of your work—and makes it easier for the right people to find you." />
         <div className="begin__actions">
           <Button href="#contact" variant="primary">Book a discovery call</Button>
           <a className="button button--whatsapp" href="https://wa.me/" target="_blank" rel="noreferrer"><WhatsAppIcon />Message on WhatsApp</a>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -489,8 +630,8 @@ function BackgroundFader() {
 
   useEffect(() => {
     const sectionOrder = [
-      ['services', 5, 0], ['process', 4, 0],
-      ['who-its-for', 5, .45], ['founder', 5, .45], ['faq', 2, 0], ['contact', 4, 0],
+      ['services', 1, -.42], ['process', 2, 0], ['packages', 2, 0],
+      ['who-its-for', 3, .45], ['founder', 3, .45], ['faq', 4, 0], ['contact', 4, 0],
     ];
     const update = () => {
       const trigger = window.scrollY + window.innerHeight * .42;
@@ -512,29 +653,28 @@ function BackgroundFader() {
 
   return (
     <div className="background-fader" aria-hidden="true">
-      <LandscapeBackground active={active === 0} />
-      <div className={`background-fader__media background-fader__white${active === 5 ? ' background-fader__media--active' : ''}`} />
-      {[1, 2, 3, 4].map((state) => <img className={`background-fader__media${active === state ? ' background-fader__media--active' : ''}`} key={state} src={`/assets/evae-bg-${state}.png`} alt="" />)}
+      <ScrollBackground active={active === 0} />
+      {[1, 2, 3, 4].map((state) => <img className={`background-fader__media background-fader__media--${state}${active === state ? ' background-fader__media--active' : ''}`} key={state} src={`/assets/evae-bg-${state}.png`} alt="" />)}
     </div>
   );
 }
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <>
+    <SmoothScroll>
       <Navigation />
       <div className="landing">
       <BackgroundFader />
       <Hero />
-      <RealitySection />
       <BlueprintSection />
       <ServicesSection />
       <HowWorksSection />
+      <PackagesSection />
       <WhoItsForSection />
       <FounderSection />
       <FAQSection />
       <BeginSection />
       </div>
-    </>
+    </SmoothScroll>
   </StrictMode>
 );
