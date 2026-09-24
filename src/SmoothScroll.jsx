@@ -11,6 +11,7 @@ const options = {
   allowNestedScroll: true,
   stopInertiaOnNavigate: true,
   autoRaf: true,
+  naiveDimensions: true, // read the live document height: routes swap pages of very different heights
 };
 
 // The mobile menu locks scrolling by setting body.style.overflow = 'hidden' (see Navigation).
