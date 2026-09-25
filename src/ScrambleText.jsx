@@ -80,6 +80,7 @@ export default function ScrambleText({
   }, [radius, duration, speed, scrambleChars, text]);
 
   const lines = String(text).split('\n');
+  let charIndex = 0; // running index across all lines, exposed as --i for staggered load animations
 
   return (
     <Tag ref={rootRef} className={`scramble${className ? ` ${className}` : ''}`} aria-label={lines.join(' ')} {...rest}>
@@ -91,7 +92,7 @@ export default function ScrambleText({
               {wordIndex > 0 && ' '}
               <span className="scramble__word">
                 {Array.from(word).map((ch, i) => (
-                  <span className="scramble__char" key={i}><span>{ch}</span><span /></span>
+                  <span className="scramble__char" key={i} style={{ '--i': charIndex++ }}><span>{ch}</span><span /></span>
                 ))}
               </span>
             </span>

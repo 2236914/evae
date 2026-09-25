@@ -12,8 +12,7 @@ export default function ComparePage() {
       <section className="compare-page" aria-labelledby="compare-title">
         <Reveal className="shell compare-page__header">
           <Link className="page__back" to="/#packages"><ArrowIcon /> Back to packages</Link>
-          <div className="eyebrow eyebrow--light">Packages</div>
-          <p className="packages__kicker">3-month programme</p>
+          <div className="eyebrow eyebrow--light">3-month programme</div>
           <ScrambleText as="h1" id="compare-title" text={"Every inclusion,\nside by side."} />
           <p className="packages__lede">Nineteen inclusions across three tiers. Every tier includes private 1:1 time with Dr Hasia.</p>
         </Reveal>

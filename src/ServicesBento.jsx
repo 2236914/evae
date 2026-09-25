@@ -6,7 +6,7 @@ import ScrambleText from './ScrambleText';
 const tiles = [
   { number: '01', title: 'Positioning & brand identity', description: 'We define the space you can own, then build the messaging and visual identity that make it recognisably yours.', span: '2x2', preview: true,
     chips: [['Positioning', Compass], ['Messaging', MessageSquare], ['Visual identity', Palette]] },
-  { number: '02', title: 'Content & social', description: 'Everything from the first line of a script to the published post—planned, produced and managed by one team.', span: '2x1',
+  { number: '02', title: 'Content & social', description: 'Script to published post, planned, produced and managed by one team. Over one billion views generated so far.', span: '2x1',
     chips: [['Script writing', PenLine], ['Videography', Video], ['Video editing', Scissors], ['Podcasts', Mic], ['Social media', Share2], ['Creative AI', Sparkles]] },
   { number: '03', title: 'Website & digital home', description: 'A custom-built site that carries your brand and your proof, wired to the systems that turn visitors into inquiries.', span: '1x1',
     chips: [['Design', LayoutTemplate], ['Custom build', Code], ['CRM setup', Database], ['Inquiry pathway', Inbox]] },
