@@ -79,24 +79,32 @@ export default function ScrambleText({
     };
   }, [radius, duration, speed, scrambleChars, text]);
 
+  // Accent: wrap a phrase in *asterisks* to set it in the italic serif (class "ac"), e.g. "A *clear* process".
   const lines = String(text).split('\n');
   let charIndex = 0; // running index across all lines, exposed as --i for staggered load animations
+  let accent = false;
 
   return (
-    <Tag ref={rootRef} className={`scramble${className ? ` ${className}` : ''}`} aria-label={lines.join(' ')} {...rest}>
+    <Tag ref={rootRef} className={`scramble${className ? ` ${className}` : ''}`} aria-label={lines.join(' ').replace(/\*/g, '')} {...rest}>
       {lines.map((line, lineIndex) => (
         <span key={lineIndex} aria-hidden="true">
           {lineIndex > 0 && <br className={breakClassName} />}
-          {line.split(' ').map((word, wordIndex) => (
-            <span key={wordIndex}>
-              {wordIndex > 0 && ' '}
-              <span className="scramble__word">
-                {Array.from(word).map((ch, i) => (
-                  <span className="scramble__char" key={i} style={{ '--i': charIndex++ }}><span>{ch}</span><span /></span>
-                ))}
+          {line.split(' ').map((raw, wordIndex) => {
+            if (raw.startsWith('*')) accent = true;
+            const isAccent = accent;
+            if (raw.endsWith('*')) accent = false;
+            const word = raw.replace(/\*/g, '');
+            return (
+              <span key={wordIndex}>
+                {wordIndex > 0 && ' '}
+                <span className={`scramble__word${isAccent ? ' ac' : ''}`}>
+                  {Array.from(word).map((ch, i) => (
+                    <span className="scramble__char" key={i} style={{ '--i': charIndex++ }}><span>{ch}</span><span /></span>
+                  ))}
+                </span>
               </span>
-            </span>
-          ))}
+            );
+          })}
         </span>
       ))}
     </Tag>

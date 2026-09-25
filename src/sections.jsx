@@ -87,7 +87,7 @@ function HeroContent() {
   return (
     <div className="hero__content shell">
       <h1 id="hero-title">
-        <ScrambleText className="hero__line hero__line--soft" text="Elevate your" />
+        <ScrambleText className="hero__line hero__line--soft" text="*Elevate* your" />
         <ScrambleText className="hero__line hero__line--strong" text="digital presence." />
       </h1>
       <ScrambleText as="p" className="hero__lede" text={"Personal branding for the modern doctor.\nOne team. One point of contact."} />
@@ -182,7 +182,7 @@ export function BlueprintSection() {
     <section className="blueprint" id="blueprint" aria-labelledby="blueprint-title">
       <Reveal className="shell blueprint__header">
         <div className="eyebrow eyebrow--light">The blueprint at work</div>
-        <ScrambleText as="h2" id="blueprint-title" text={"Everything we do,\nwe’ve done for ourselves first."} />
+        <ScrambleText as="h2" id="blueprint-title" text={"Everything we do,\nwe’ve done for *ourselves* first."} />
         <p className="blueprint__lede"><ScrambleText as="strong" text="Four brands. Four distinct audiences. One proven approach." /><br /><ScrambleText text="Over one billion views generated across the Doctor Hasia ecosystem, with one playbook." /></p>
       </Reveal>
       <div className="blueprint__stack shell" ref={stackRef}>
@@ -197,7 +197,9 @@ export function BlueprintSection() {
             </div>
             <div className="blueprint-card__info">
               <div className="blueprint-card__top"><span className="blueprint-card__number">{brand.number}</span><span className="blueprint-card__niche">{brand.niche}</span></div>
-              <ScrambleText as="h3" text={brand.name} />
+              {brandLogos[brand.name]
+                ? <h3 className="blueprint-card__title-logo"><span role="img" aria-label={brand.name} style={{ '--logo': `url(${brandLogos[brand.name]})` }} /></h3>
+                : <ScrambleText as="h3" text={brand.name} />}
               <ScrambleText as="p" className="blueprint-card__description" text={brand.description} />
               <div className="blueprint-card__rule" />
               {hasNumbers(brand)
@@ -282,7 +284,7 @@ export function HowWorksSection() {
       <Reveal className="process__layout shell">
         <div className="process__intro">
           <div className="eyebrow eyebrow--light">How it works</div>
-          <ScrambleText as="h2" id="process-title" text={"A clear process,\nbuilt around you."} />
+          <ScrambleText as="h2" id="process-title" text={"A *clear* process,\nbuilt around you."} />
           <ScrambleText as="p" text="From the first conversation to ongoing growth, every stage is managed by one team." />
           <div className="process__visual liquid-glass-frost" ref={visualRef} data-autoplay={autoplay && !userPicked} style={{ '--step-ms': `${STEP_MS}ms` }} onPointerDown={phone ? onPointerDown : undefined} onPointerUp={phone ? onPointerUp : undefined} onPointerCancel={() => { swipe.current.active = false; }}>
             <div className="process__visual-art">
@@ -357,7 +359,7 @@ export function PackagesSection() {
     <section className="packages" id="packages" aria-labelledby="packages-title">
       <Reveal className="packages__inner shell">
         <div className="eyebrow eyebrow--light">3-month programme</div>
-        <ScrambleText as="h2" id="packages-title" text={"Three ways to begin.\nOne dedicated team."} />
+        <ScrambleText as="h2" id="packages-title" text={"*Three ways* to begin.\nOne dedicated team."} />
         <ScrambleText as="p" className="packages__lede" text="Strategy, authority building and content execution. Every tier includes private 1:1 time with Dr Hasia." />
         <p className="packages__meta"><span>3-month minimum</span><span aria-hidden="true">·</span><span>Billed monthly in AED</span></p>
       </Reveal>
@@ -432,7 +434,7 @@ export function WhoItsForSection() {
     <section className={`fit${visible ? ' fit--visible' : ''}`} id="who-its-for" ref={sectionRef} aria-labelledby="fit-title">
       <div className="fit__inner shell">
         <div className="eyebrow eyebrow--light">Is EVAE right for you?</div>
-        <ScrambleText as="h2" id="fit-title" text={"EVAE is for doctors\nwho are ready to be visible."} />
+        <ScrambleText as="h2" id="fit-title" text={"EVAE is for doctors\nwho are *ready* to be visible."} />
         <div className="fit__grid">
           {fitStatements.map((statement, index) => <article className="fit-item" key={statement}><span>{String(index + 1).padStart(2, '0')}</span><ScrambleText as="p" text={statement} /></article>)}
         </div>
@@ -467,8 +469,8 @@ export function FounderSection() {
         </div>
         <div className="founder__copy">
           <div className="eyebrow eyebrow--light founder__eyebrow--desk">From the founder</div>
-          <ScrambleText as="h2" id="founder-title" text={"The blueprint was built\nfrom experience."} />
-          <blockquote>“I built my own digital presence one brand at a time. What changed my practice was not simply being seen—it was being understood. EVAE brings that same clarity, consistency and support to other doctors.”</blockquote>
+          <ScrambleText as="h2" id="founder-title" text={"The blueprint was built\nfrom *experience.*"} />
+          <blockquote>“<em className="ac">I built my own</em> digital presence one brand at a time. What changed my practice was not simply being seen—it was being understood. EVAE brings that same clarity, consistency and support to other doctors.”</blockquote>
           <p className="founder__byline"><strong>Doctor Hasia</strong><span>Founder, EVAE</span></p>
           {/* Working quotation: subject to founder approval before launch. */}
         </div>
@@ -493,7 +495,7 @@ export function FAQSection() {
       <Reveal className="faq__layout shell">
         <div className="faq__intro">
           <div className="eyebrow eyebrow--light">FAQ</div>
-          <ScrambleText as="h2" id="faq-title" text={"Questions,\nanswered."} />
+          <ScrambleText as="h2" id="faq-title" text={"*Questions,*\nanswered."} />
         </div>
         <div className="faq__surface liquid-glass-frost">
           {faqItems.map(([question, answer], index) => (
@@ -528,7 +530,7 @@ export function BeginSection() {
     <section className="begin" id="contact" style={{ '--begin-parallax': `${offset}px` }} aria-labelledby="begin-title">
       <Reveal className="begin__inner shell">
         <div className="eyebrow eyebrow--light">Your expertise deserves to be seen</div>
-        <ScrambleText as="h2" id="begin-title" text={"Be known for more\nthan your credentials."} />
+        <ScrambleText as="h2" id="begin-title" text={"Be known for *more*\nthan your credentials."} />
         <ScrambleText as="p" className="begin__lede" text="Build a digital presence that reflects the quality of your work — and helps the right people find, trust, and choose you." />
         <div className="begin__actions">
           <Button href="#contact" variant="primary">Book a discovery call</Button>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap');
 
 :root {
   --ease-out: cubic-bezier(.2, .7, .2, 1);
@@ -26,6 +26,7 @@
   --fs-eyebrow: clamp(.75rem, .69rem + .25vw, .83rem);     /* never below 12px */
   --fs-micro: clamp(.75rem, .71rem + .2vw, .84rem);        /* labels, badges, table heads: 12px floor */
   --fs-button: clamp(.8rem, .76rem + .2vw, .9rem);         /* one button scale */
+  --font-accent: 'Instrument Serif', Georgia, 'Times New Roman', serif; /* italic accent inside Geist headlines */
   --cta: #2b2115;
   --cta-hover: #1d160e;
   /* Card glass (How it works → FAQ): the nav pill's clear glass, with the dark text hierarchy */
@@ -74,6 +75,10 @@ a { color: inherit; text-decoration: none; }
 }
 .reveal.in { opacity: 1; filter: blur(0); transform: none; will-change: auto; }
 
+/* Headline accent: one phrase per headline in the italic serif, 6% larger so its x-height sits with Geist Light. */
+.ac { font-family: var(--font-accent); font-style: italic; font-weight: 400; font-size: 1.06em; letter-spacing: -.01em; }
+.hero__line--soft .ac { color: #fff; }
+
 /* ScrambleText: the real glyph stays in flow for layout; the scramble glyph is stacked on top. */
 .scramble__word { white-space: nowrap; }
 .scramble__char { position: relative; display: inline; }
@@ -83,6 +88,14 @@ a { color: inherit; text-decoration: none; }
 
 /* Hero: on-load blur-in, staggered per child (same curve as .reveal). */
 @keyframes hero-in { from { opacity: 0; filter: blur(10px); transform: translateY(22px); } to { opacity: 1; filter: blur(0); transform: none; } }
+/* Landing: the nav breathes in from the top edge and the trust row from the bottom edge, each as one
+   unit settling into place. Uses the `translate` property so it never fights the existing transforms
+   (the desktop nav is centred with translateX, the phone wordmark/burger with translateY). The nav stays
+   mounted across routes, so this plays once per full page load. */
+@keyframes breathe-down { from { opacity: 0; translate: 0 -22px; scale: .985; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@keyframes breathe-up { from { opacity: 0; filter: blur(8px); translate: 0 22px; scale: .985; } to { opacity: 1; filter: blur(0); translate: 0 0; scale: 1; } }
+.nav { animation: breathe-down 1s cubic-bezier(.2, .7, .1, 1) both .15s; }
+.hero__footer { animation: breathe-up 1s cubic-bezier(.2, .7, .1, 1) both .15s; }
 .hero__content > .hero__lede, .hero__content > .button { animation: hero-in .7s var(--ease-out) both; }
 .hero__content > .hero__lede { animation-delay: .75s; }
 .hero__content > .button { animation-delay: .9s; }
@@ -102,7 +115,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .hero__sticky { position: sticky; top: 0; display: grid; width: 100%; height: 100svh; overflow: hidden; place-items: center; background: transparent; }
-.hero__shade { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; background: linear-gradient(180deg, rgba(3, 9, 19, .34) 0%, rgba(5, 10, 18, .08) 42%, rgba(36, 27, 20, .18) 100%); }
+.hero__shade { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; background: linear-gradient(180deg, rgba(3,9,19,.38) 0%, rgba(5,10,18,.12) 40%, rgba(20,14,10,.22) 70%, rgba(20,14,10,.36) 100%); }
 
 .landing { position: relative; isolation: isolate; overflow: visible; background: transparent; }
 .background-fader { position: fixed; inset: 0; z-index: -4; overflow: hidden; pointer-events: none; background: #f4f5f6; }
@@ -220,6 +233,8 @@ section[id], main[id] { scroll-margin-top: 6rem; }
 @media (max-width: 520px) { .bento { grid-template-columns: minmax(0, 1fr); } .bento-tile--2x2, .bento-tile--2x1 { grid-column: span 1; } }
 
 .blueprint { position: relative; isolation: isolate; overflow: visible; padding: var(--section-top) 0 var(--section-bottom); color: #1b1717; background: transparent; }
+/* Legibility scrim: warm near-black under the white header and card copy, fading out toward Services */
+.blueprint::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(180deg, rgba(20,14,10,.18) 0%, rgba(20,14,10,.34) 35%, rgba(20,14,10,.34) 75%, rgba(20,14,10,.14) 100%); }
 .blueprint__header { position: relative; z-index: 2; text-align: center; }
 .blueprint__header > .eyebrow { display: table; width: max-content; max-width: 100%; margin: 0 auto; }
 .blueprint__header .eyebrow { color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.35); }
@@ -250,6 +265,8 @@ section[id], main[id] { scroll-margin-top: 6rem; }
 .blueprint-card__number { color: rgba(255,255,255,.6); font-size: var(--fs-micro); letter-spacing: .16em; }
 .blueprint-card__niche { color: rgba(255,255,255,.55); font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: .14em; }
 .blueprint-card h3 { margin: clamp(1.1rem, .7rem + 1.4vw, 2rem) 0 .7rem; color: #fff; line-height: .98; font-weight: 300; letter-spacing: -.065em; }
+.blueprint-card__title-logo { display: block; }
+.blueprint-card__title-logo span { display: block; height: clamp(3.4rem, 2.4rem + 3.2vw, 5.5rem); aspect-ratio: 357 / 172; margin-left: -.35rem; background: #fff; -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; opacity: .95; }
 .blueprint-card__description { margin: 0; color: rgba(255,255,255,.72); line-height: 1.4; }
 .blueprint-card__rule { width: 100%; height: 1px; margin: clamp(1.1rem, .9rem + 1vw, 1.8rem) 0 clamp(1rem, .75rem + 1vw, 1.5rem); background: rgba(255,255,255,.2); }
 .blueprint-card__metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; color: #fff; font-size: clamp(1.3rem, 1.15rem + .6vw, 1.65rem); }
@@ -376,10 +393,11 @@ section[id], main[id] { scroll-margin-top: 6rem; }
 .case__hero .eyebrow { display: table; width: max-content; max-width: 100%; }
 .case__lede { max-width: 38rem; margin: 0; color: var(--ink-2); font-size: var(--fs-lede); line-height: 1.5; }
 .case__chips { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: var(--lede-gap); }
-.case__chips span { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.05rem .6rem .9rem; border: 1px solid rgba(140,104,72,.28); border-radius: 999px; color: #5b4532; background: rgba(255,255,255,.5); font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: .08em; }
+.case__chips a { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.05rem .6rem .9rem; border: 1px solid rgba(140,104,72,.28); border-radius: 999px; color: #5b4532; background: rgba(255,255,255,.5); font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: .08em; transition: background .2s ease, border-color .2s ease; }
+.case__chips a:hover, .case__chips a:focus-visible { background: rgba(255,255,255,.85); border-color: rgba(140,104,72,.5); outline: none; }
 .case__chips svg { width: .95rem; height: .95rem; flex: 0 0 auto; }
 .case__mark { aspect-ratio: 1 / 1; width: 100%; margin: 0; border-radius: var(--radius-card); --glass-bg: rgba(20,18,24,.55); }
-.case__metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-top: var(--stack-gap); padding: clamp(1.25rem, 1rem + 1vw, 2rem); border-radius: var(--radius-card); }
+.case__metrics { display: grid; grid-template-columns: 1fr 1fr 1.2fr 1.8fr; gap: 1rem; margin-top: var(--stack-gap); padding: clamp(1.25rem, 1rem + 1vw, 2rem); border-radius: var(--radius-card); }
 .case__metrics div + div { border-left: 1px solid var(--line); padding-left: 1rem; }
 .case__metrics b { display: block; margin-bottom: .5rem; color: var(--ink-3); font-size: var(--fs-micro); font-weight: 400; text-transform: uppercase; letter-spacing: .14em; }
 .case__metrics span { font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.6rem); font-weight: 300; letter-spacing: -.045em; }
@@ -680,6 +698,7 @@ section[id], main[id] { scroll-margin-top: 6rem; }
   .reveal { opacity: 1; filter: none; transform: none; transition: none; }
   .hero__content > * { animation: none; }
   .hero h1 .scramble__char { animation: none; opacity: 1; }
+  .nav, .hero__footer { animation: none; }
   .brand-row { overflow-x: auto; -webkit-mask-image: none; mask-image: none; scrollbar-width: none; }
   .brand-row::-webkit-scrollbar { display: none; }
   .brand-row__track { animation: none; }

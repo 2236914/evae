@@ -23,7 +23,7 @@ export default function ServicesBentoSection() {
     <section className="services-bento" id="services" aria-labelledby="services-title">
       <Reveal className="shell services-bento__inner">
         <div className="eyebrow eyebrow--light">Services</div>
-        <ScrambleText as="h2" id="services-title" text={"Everything a doctor\nneeds to be known online."} />
+        <ScrambleText as="h2" id="services-title" text={"Everything a doctor\nneeds to be *known* online."} />
         <p className="services-bento__lede">Four things we build. Nine ways we do it. One team.</p>
       </Reveal>
       <div className="bento shell">

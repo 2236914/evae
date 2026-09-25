@@ -1,11 +1,9 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { Globe2, Share2 } from 'lucide-react';
+import { AtSign, Globe2 } from 'lucide-react';
 import { caseStudies } from '../data';
 import { ArrowIcon, BackgroundFader, BeginSection, BrandMark } from '../sections';
 import Reveal from '../Reveal';
 import ScrambleText from '../ScrambleText';
-
-const channelIcons = { Website: Globe2, 'Social media': Share2 };
 
 export default function CaseStudyPage() {
   const { slug } = useParams();
@@ -25,8 +23,8 @@ export default function CaseStudyPage() {
             <ScrambleText as="h1" id="case-title" text={study.name} />
             <p className="case__lede">{study.description} {study.summary}</p>
             <div className="case__chips">
-              {study.channels.map((channel) => { const Icon = channelIcons[channel] || Globe2; return <span key={channel}><Icon aria-hidden="true" strokeWidth={1.7} />{channel}</span>; })}
-              <span>{study.handle}</span>
+              {study.site && <a href={study.site} target="_blank" rel="noreferrer"><Globe2 aria-hidden="true" strokeWidth={1.7} />Website</a>}
+              {study.instagram && <a href={study.instagram} target="_blank" rel="noreferrer"><AtSign aria-hidden="true" strokeWidth={1.7} />{study.handle}</a>}
             </div>
           </div>
           <div className="case__mark blueprint-card__image liquid-glass-strong"><BrandMark brand={study} /></div>
@@ -35,8 +33,8 @@ export default function CaseStudyPage() {
         <Reveal className="shell case__metrics liquid-glass-frost" delayMs={80}>
           <div><b>Followers</b><span>{study.followers}</span></div>
           <div><b>Monthly reach</b><span>{study.reach}</span></div>
-          <div><b>Growth</b><span>{study.growth}</span></div>
           <div><b>Niche</b><span className="case__metric-text">{study.niche}</span></div>
+          <div><b>Proof</b><span className="case__metric-text">{study.proof}</span></div>
         </Reveal>
 
         <div className="shell case__body">
